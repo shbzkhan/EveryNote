@@ -1,8 +1,13 @@
 # create-t3-turbo
 
-> [!NOTE]
->
-> OAuth deployments are now working for preview deployments. Read [deployment guide](https://github.com/t3-oss/create-t3-turbo#auth-proxy) and [check out the source](./apps/auth-proxy) to learn more!
+This is a fork of `create-t3-app` modified to use [Better Auth](https://better-auth.com) instead of NextAuth.
+
+Better Auth is a framework-agnostic authentication and authorization library for TypeScript. It offers a comprehensive set of built-in features and a plugin ecosystem.
+
+**Advantages of Better Auth:**
+- Native Expo support without any extra setup (including OAuth)
+- Preview deployments without the need for a separate proxy server
+- A lot more features available out of the box and through plugins
 
 ## Installation
 
