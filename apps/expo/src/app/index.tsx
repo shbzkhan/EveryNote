@@ -6,7 +6,7 @@ import { FlashList } from "@shopify/flash-list";
 
 import type { RouterOutputs } from "~/utils/api";
 import { api } from "~/utils/api";
-import { useSignIn, useSignOut, useUser } from "~/utils/auth";
+import { authClient, signIn, signOut } from "~/utils/auth";
 
 function PostCard(props: {
   post: RouterOutputs["post"]["all"][number];
@@ -96,18 +96,18 @@ function CreatePost() {
 }
 
 function MobileAuth() {
-  const user = useUser();
-  const signIn = useSignIn();
-  const signOut = useSignOut();
-
+  const { data: session } = authClient.useSession();
   return (
     <>
       <Text className="pb-2 text-center text-xl font-semibold text-white">
-        {user?.name ?? "Not logged in"}
+        {session?.user.name ?? "Not logged in"}
       </Text>
       <Button
-        onPress={() => (user ? signOut() : signIn())}
-        title={user ? "Sign Out" : "Sign In With Discord"}
+        onPress={() => (session ? signOut() : signIn.social({
+          provider: "discord",
+          callbackURL: "/",
+        }))}
+        title={session ? "Sign Out" : "Sign In With Discord"}
         color={"#5B65E9"}
       />
     </>
