@@ -1,6 +1,7 @@
 import { db } from "@acme/db/client";
 import { oAuthProxy } from "better-auth/plugins"
-import { betterAuth, BetterAuthOptions } from "better-auth";
+import type { BetterAuthOptions } from "better-auth";
+import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { env } from "../env";
 import { expo } from "@better-auth/expo";

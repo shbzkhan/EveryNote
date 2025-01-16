@@ -10,16 +10,7 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { db } from "@acme/db/client";
-import { getSession, type Session } from "@acme/auth";
-
-/**
- * Isomorphic Session getter for API requests
- * - Expo requests will have a session token in the Authorization header
- * - Next.js requests will have a session token in cookies
- */
-const isomorphicGetSession = async (headers: Headers) => {
-  return await getSession()
-};
+import { auth } from "@acme/auth";
 
 /**
  * 1. CONTEXT
@@ -35,18 +26,13 @@ const isomorphicGetSession = async (headers: Headers) => {
  */
 export const createTRPCContext = async (opts: {
   headers: Headers;
-  session: Session | null;
 }) => {
-  const authToken = opts.headers.get("Authorization") ?? null;
-  const session = await isomorphicGetSession(opts.headers);
-
-  const source = opts.headers.get("x-trpc-source") ?? "unknown";
-  console.log(">>> tRPC Request from", source, "by", session?.user);
-
+  const session = await auth.api.getSession({
+    headers: opts.headers,
+  })
   return {
     session,
     db,
-    token: authToken,
   };
 };
 
