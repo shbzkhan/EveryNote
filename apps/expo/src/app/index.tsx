@@ -99,7 +99,7 @@ function MobileAuth() {
   const { data: session } = authClient.useSession();
   return (
     <>
-      <Text className="pb-2 text-center text-xl font-semibold text-white">
+      <Text className="pb-2 text-center text-xl font-semibold">
         {session?.user.name ?? "Not logged in"}
       </Text>
       <Button
@@ -116,8 +116,6 @@ function MobileAuth() {
 
 export default function Index() {
   const utils = api.useUtils();
-
-  const postQuery = api.post.all.useQuery();
 
   const deletePostMutation = api.post.delete.useMutation({
     onSettled: () => utils.post.all.invalidate(),
@@ -139,18 +137,6 @@ export default function Index() {
             Press on a post
           </Text>
         </View>
-
-        <FlashList
-          data={postQuery.data}
-          estimatedItemSize={20}
-          ItemSeparatorComponent={() => <View className="h-2" />}
-          renderItem={(p) => (
-            <PostCard
-              post={p.item}
-              onDelete={() => deletePostMutation.mutate(p.item.id)}
-            />
-          )}
-        />
 
         <CreatePost />
       </View>

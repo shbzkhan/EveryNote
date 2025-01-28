@@ -11,14 +11,15 @@ export const config = {
         provider: "pg"
     }),
     secret: env.AUTH_SECRET,
-    plugins: [expo(), oAuthProxy()],
+    plugins: [oAuthProxy(), expo()],
     socialProviders: {
         discord: {
             clientId: env.AUTH_DISCORD_ID,
             clientSecret: env.AUTH_DISCORD_SECRET,
             redirectURI: "http://localhost:3000/api/auth/callback/discord",
         }
-    }
+    },
+    trustedOrigins: ["exp://"]
 } satisfies BetterAuthOptions
 
 export const auth = betterAuth(config);
