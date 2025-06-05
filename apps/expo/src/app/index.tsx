@@ -1,145 +1,58 @@
-import { useState } from "react";
-import { Button, Pressable, Text, TextInput, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Link, Stack } from "expo-router";
-import { FlashList } from "@shopify/flash-list";
+import { router } from 'expo-router';
+import { useEffect } from 'react';
+import { View, Button, Text, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import CustomButton from '~/components/Button';
+import icons from "~/constant/icons"
 
-import type { RouterOutputs } from "~/utils/api";
-import { api } from "~/utils/api";
-import { authClient, signIn, signOut } from "~/utils/auth";
+ import * as Google from 'expo-auth-session/providers/google';
 
-function PostCard(props: {
-  post: RouterOutputs["post"]["all"][number];
-  onDelete: () => void;
-}) {
-  return (
-    <View className="flex flex-row rounded-lg bg-muted p-4">
-      <View className="flex-grow">
-        <Link
-          asChild
-          href={{
-            pathname: "/post/[id]",
-            params: { id: props.post.id },
-          }}
-        >
-          <Pressable className="">
-            <Text className="text-xl font-semibold text-primary">
-              {props.post.title}
-            </Text>
-            <Text className="mt-2 text-foreground">{props.post.content}</Text>
-          </Pressable>
-        </Link>
-      </View>
-      <Pressable onPress={props.onDelete}>
-        <Text className="font-bold uppercase text-primary">Delete</Text>
-      </Pressable>
-    </View>
-  );
-}
-
-function CreatePost() {
-  const utils = api.useUtils();
-
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-
-  const { mutate, error } = api.post.create.useMutation({
-    async onSuccess() {
-      setTitle("");
-      setContent("");
-      await utils.post.all.invalidate();
-    },
+export default function LoginScreen() {
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    expoClientId: process.env.EXPO_CLIENT_ID,
+    iosClientId: process.env.IOS_CLIENT_ID,
+    androidClientId: process.env.ANDROID_CLIENT_ID,
   });
 
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { authentication } = response;
+      router.replace("/home")
+    }
+  }, [response]);
+
   return (
-    <View className="mt-4 flex gap-2">
-      <TextInput
-        className="items-center rounded-md border border-input bg-background px-3 text-lg leading-[1.25] text-foreground"
-        value={title}
-        onChangeText={setTitle}
-        placeholder="Title"
-      />
-      {error?.data?.zodError?.fieldErrors.title && (
-        <Text className="mb-2 text-destructive">
-          {error.data.zodError.fieldErrors.title}
-        </Text>
-      )}
-      <TextInput
-        className="items-center rounded-md border border-input bg-background px-3 text-lg leading-[1.25] text-foreground"
-        value={content}
-        onChangeText={setContent}
-        placeholder="Content"
-      />
-      {error?.data?.zodError?.fieldErrors.content && (
-        <Text className="mb-2 text-destructive">
-          {error.data.zodError.fieldErrors.content}
-        </Text>
-      )}
-      <Pressable
-        className="flex items-center rounded bg-primary p-2"
-        onPress={() => {
-          mutate({
-            title,
-            content,
-          });
-        }}
+    <SafeAreaView className='h-full'>
+      <ScrollView contentContainerClassName='h-full w-full px-4 py-10 flex justify-between'
+      showsVerticalScrollIndicator={false}
       >
-        <Text className="text-foreground">Create</Text>
-      </Pressable>
-      {error?.data?.code === "UNAUTHORIZED" && (
-        <Text className="mt-2 text-destructive">
-          You need to be logged in to create a post
-        </Text>
-      )}
-    </View>
-  );
-}
-
-function MobileAuth() {
-  const { data: session } = authClient.useSession();
-  return (
-    <>
-      <Text className="pb-2 text-center text-xl font-semibold">
-        {session?.user.name ?? "Not logged in"}
-      </Text>
-      <Button
-        onPress={() => (session ? signOut() : signIn.social({
-          provider: "discord",
-          callbackURL: "/",
-        }))}
-        title={session ? "Sign Out" : "Sign In With Discord"}
-        color={"#5B65E9"}
-      />
-    </>
-  );
-}
-
-export default function Index() {
-  const utils = api.useUtils();
-
-  const deletePostMutation = api.post.delete.useMutation({
-    onSettled: () => utils.post.all.invalidate(),
-  });
-
-  return (
-    <SafeAreaView className="bg-background">
-      {/* Changes page title visible on the header */}
-      <Stack.Screen options={{ title: "Home Page" }} />
-      <View className="h-full w-full bg-background p-4">
-        <Text className="pb-2 text-center text-5xl font-bold text-foreground">
-          Create <Text className="text-primary">T3</Text> Turbo
-        </Text>
-
-        <MobileAuth />
-
-        <View className="py-2">
-          <Text className="font-semibold italic text-primary">
-            Press on a post
-          </Text>
+      <View className=''>
+        <View>
+          <Text className='text-4xl font-bold'>EveryNote</Text>
         </View>
+        <View>
+        <Text className='text-gray-400'>Capture your thoughts, your way</Text>
+        <Text className='text-gray-400'>Text, voice, or media- EveryNote make it effortless to record your day and reflect with AI-powered clarity</Text>
 
-        <CreatePost />
+        </View>
       </View>
+    <View className="p-4 flex gap-5">
+      <CustomButton
+        title='Log in with Google'
+        icons={icons.google}
+        containerStyle='bg-white'
+        textStyle='text-black'
+        handlePress={()=>promptAsync()}
+      />
+      <CustomButton
+        title='Log in with Github'
+        icons={icons.apple}
+        tintColor="white"
+        handlePress={()=>promptAsync()}
+      />
+      <Text className='text-md text-center mt-6 text-gray-400'>By continuing, you agree to out Terms of service and privacy Policy</Text>
+    </View>
+    </ScrollView>
     </SafeAreaView>
   );
 }
